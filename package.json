@@ -1,0 +1,32 @@
+{
+  "name": "virtual-node-env",
+  "version": "0.1.0",
+  "description": "Virtual environment that makes to run node ^v4.0x app on node v0.10x server",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "keywords": [
+    "lambda",
+    "aws",
+    "switching versions",
+    "virtual"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iDEAKITT/virtual-node-env.git"
+  },
+  "author": "Yuki Takei",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iDEAKITT/virtual-node-env/issues"
+  },
+  "homepage": "https://github.com/iDEAKITT/virtual-node-env#readme",
+  "dependencies": {
+    "bluebird": "^3.3.4"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  }
+}
