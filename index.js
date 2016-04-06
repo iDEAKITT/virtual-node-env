@@ -26,6 +26,8 @@ var TARGZ = ".tar.gz";
 
 exports.version = "v4.4.2";
 
+exports.downloadBaseURL = "https://nodejs.org/dist";
+
 exports.node = function(){
   var argv = normalizeOptions(arguments);
   return Promise.resolve()
@@ -45,6 +47,10 @@ exports.npm = function(){
 };
 
 exports.fetch = _fetchNode;
+
+function url(){
+  return exports.downloadBaseURL + "/" + exports.version;
+}
 
 function version(){
   return exports.version;
@@ -95,11 +101,11 @@ function _fetchNode(dir){
   return checkExists(cwd + "/" + e.NAME).then(function(yes){
     if(!yes) {
       return new Promise(function(resolve, reject){
-        var download = wget.download("https://nodejs.org/dist/" + version() + "/" + e.NAME + TARGZ, cwd + "/" + e.NAME + TARGZ);
+        var download = wget.download(url() + "/" + e.NAME + TARGZ, cwd + "/" + e.NAME + TARGZ);
         download.on('error', reject);
 
         download.on('start', function(fileSize) {
-          console.log("Downloading... https://nodejs.org/dist/" + version() + "/" + e.NAME + TARGZ);
+          console.log("Downloading... " + url() + "/" + e.NAME + TARGZ);
         });
 
         download.on('end', function(){

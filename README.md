@@ -50,7 +50,8 @@ vne.fetch(); // Will be started to fetch node.js v5.10.0 from https://nodejs.org
 ## Apis
 
 #### Properties
-`vne.version`: {String} Node.js version string. default is `v4.4.2`
+* `vne.version`: {String} Node.js version string. Default is `v4.4.2`
+* `vne.downloadBaseURL`: {String} BaseUrl for downloading target. Default is `https://nodejs.org/dist`
 
 #### Methods
 
