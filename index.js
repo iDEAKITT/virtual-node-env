@@ -19,21 +19,26 @@ var checkExists = function(path){
 };
 var osSuffix = os.type() === "Darwin" ? "darwin-x64" : "linux-x64";
 
+var NODE = "/bin/node";
+var NPM = "/bin/npm";
+var TARGZ = ".tar.gz";
+
+
 exports.version = "v4.4.2";
 
 exports.node = function(){
-  var argv = arguments;
+  var argv = normalizeOptions(arguments);
   return Promise.resolve()
-    .then(fetchNode)
+    .then(fetchNode.bind(null, argv[1].NODE_ROOT))
     .then(function(){
       return node.apply(null, argv);
     });
 };
 
 exports.npm = function(){
-  var argv = arguments;
+  var argv = normalizeOptions(arguments);
   return Promise.resolve()
-    .then(fetchNode)
+    .then(fetchNode.bind(null, argv[1].NODE_ROOT))
     .then(function(){
       return npm.apply(null, argv);
     });
@@ -43,10 +48,15 @@ function version(){
   return exports.version;
 }
 
+function normalizeOptions(argv){
+  var opts = argv[1] || {};
+  return [argv["0"], opts];
+}
+
 function env(){
   var NAME = "node-" + exports.version + "-" + osSuffix;
-  var NODE_PATH = process.cwd() + "/" + NAME + "/bin/node";
-  var NPM_PATH = process.cwd() + "/" + NAME + "/bin/npm";
+  var NODE_PATH = process.cwd() + "/" + NAME + NODE;
+  var NPM_PATH = process.cwd() + "/" + NAME + NPM;
 
   return {
     NAME: NAME,
@@ -69,17 +79,17 @@ function pexec(cmd){
   });
 }
 
-function fetchNode(){
+function fetchNode(root){
+  var cwd = root || process.cwd();
   var e = env();
-  return checkExists(process.cwd() + "/" + e.NAME + ".tar.gz").then(function(yes){
+  return checkExists(cwd + "/" + e.NAME + ".tar.gz").then(function(yes){
     if(!yes) {
       return new Promise(function(resolve, reject){
-        console.log("https://nodejs.org/dist/" + version() + "/" + e.NAME + ".tar.gz");
-        var download = wget.download("https://nodejs.org/dist/" + version() + "/" + e.NAME + ".tar.gz", e.NAME + ".tar.gz");
+        var download = wget.download("https://nodejs.org/dist/" + version() + "/" + e.NAME + TARGZ, cwd + "/" + e.NAME + TARGZ);
         download.on('error', reject);
 
         download.on('start', function(fileSize) {
-          console.log("start downloading...");
+          console.log("Downloading... https://nodejs.org/dist/" + version() + "/" + e.NAME + TARGZ);
         });
 
         download.on('end', resolve);
@@ -87,25 +97,32 @@ function fetchNode(){
     }
   })
   .then(function(){
-    return checkExists(process.cwd() + "/" + e.NAME);
+    return checkExists(cwd + "/" + e.NAME);
   })
   .then(function(yes){
     if(!yes) {
-      return extract();
+      return extractTarGZ(cwd + "/" + e.NAME);
     }
   });
 }
 
 function node(cmd, opts){
-  return normalizeCommand(env().NODE_PATH, cmd, opts);
+  if(opts.NODE_ROOT) {
+    opts.NODE_ROOT+=NODE;
+  }
+
+  return normalizeCommand(opts.execPath || env().NODE_PATH, cmd, opts);
 }
 
 function npm(cmd, opts){
-  return normalizeCommand(env().NPM_PATH, cmd, opts);
+  if(opts.NODE_ROOT) {
+    opts.NODE_ROOT+=NPM;
+  }
+
+  return normalizeCommand(opts.execPath || env().NPM_PATH, cmd, opts);
 }
 
 function normalizeCommand(cmd, arg, opts){
-  if(!opts) opts = {};
   if(!opts.workingDir) {
     opts.workingDir = process.cwd();
   }
@@ -119,6 +136,6 @@ function normalizeCommand(cmd, arg, opts){
   ].join(" "));
 }
 
-function extract(){
-  return pexec("tar zxvf " + env().NAME + ".tar.gz  >/dev/null 2>&1");
+function extractTarGZ(path){
+  return pexec("tar zxvf " + path + TARGZ + "  >/dev/null 2>&1");
 }

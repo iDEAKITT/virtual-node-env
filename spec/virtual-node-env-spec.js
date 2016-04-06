@@ -17,4 +17,11 @@ describe('Virtual Node Env Spec', function(){
       expect(outputs.stdout).to.eq("2.15.0\n");
     });
   });
+
+  it('should switch node js version', function(){
+    vne.version = "v5.10.1";
+    return node("-v", {NODE_ROOT: __dirname + "/.."}).then(function(outputs){
+      expect(outputs.stdout).to.eq("v5.10.1\n");
+    });
+  });
 });

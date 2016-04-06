@@ -1,5 +1,5 @@
 # virtual-node-env
-Virtual environment that makes to run node ^v4.0x app on node v0.10x server.
+Programmatic virtual environment that makes to run node ^v4.0x app on node v0.10x server.
 
 The primary use case is AWS Lambda.
 
@@ -51,6 +51,7 @@ vne.version = "v5.10.0";
 - parameters
   - cmd: The path that executable .js file or commnad options
   - opts
+    - NODE_ROOT: The root directory for node
     - workingDir: The working directory that will be executed node command. default is `process.cwd()`
 
 - returns: Promise object
@@ -59,6 +60,7 @@ vne.version = "v5.10.0";
 - parameters
   - cmd: The path that executable
   - opts
+    - NODE_ROOT: The root directory for node
     - workingDir: The working directory that will be executed npm command. default is `process.cwd()`
 
 - returns: Promise object
