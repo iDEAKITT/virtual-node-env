@@ -1,6 +1,8 @@
 var Promise = require('bluebird');
 var os = require('os');
 var exec = require('child_process').exec;
+var wget = require('wget-improved');
+
 var checkExists = function(path){
   return new Promise(function(resolve, reject){
     return require('fs').stat(path, function(err, stats){
@@ -71,7 +73,17 @@ function fetchNode(){
   var e = env();
   return checkExists(process.cwd() + "/" + e.NAME + ".tar.gz").then(function(yes){
     if(!yes) {
-      return pexec("wget https://nodejs.org/dist/" + version() + "/" + e.NAME + ".tar.gz");
+      return new Promise(function(resolve, reject){
+        console.log("https://nodejs.org/dist/" + version() + "/" + e.NAME + ".tar.gz");
+        var download = wget.download("https://nodejs.org/dist/" + version() + "/" + e.NAME + ".tar.gz", e.NAME + ".tar.gz");
+        download.on('error', reject);
+
+        download.on('start', function(fileSize) {
+          console.log("start downloading...");
+        });
+
+        download.on('end', resolve);
+      });
     }
   })
   .then(function(){
