@@ -44,12 +44,14 @@ exports.npm = function(){
     });
 };
 
+exports.fetch = _fetchNode;
+
 function version(){
   return exports.version;
 }
 
 function normalizeOptions(argv){
-  var opts = argv[1] || {};
+  var opts = argv["1"] || {};
   return [argv["0"], opts];
 }
 
@@ -80,9 +82,17 @@ function pexec(cmd){
 }
 
 function fetchNode(root){
-  var cwd = root || process.cwd();
+  if(root) {
+    return Promise.resolve();
+  }
+  return _fetchNode();
+}
+
+function _fetchNode(dir){
+  var cwd = dir || process.cwd();
+
   var e = env();
-  return checkExists(cwd + "/" + e.NAME + ".tar.gz").then(function(yes){
+  return checkExists(cwd + "/" + e.NAME).then(function(yes){
     if(!yes) {
       return new Promise(function(resolve, reject){
         var download = wget.download("https://nodejs.org/dist/" + version() + "/" + e.NAME + TARGZ, cwd + "/" + e.NAME + TARGZ);
@@ -92,16 +102,12 @@ function fetchNode(root){
           console.log("Downloading... https://nodejs.org/dist/" + version() + "/" + e.NAME + TARGZ);
         });
 
-        download.on('end', resolve);
+        download.on('end', function(){
+          extractTarGZ(cwd + "/" + e.NAME, cwd).then(function(){
+            resolve();
+          });
+        });
       });
-    }
-  })
-  .then(function(){
-    return checkExists(cwd + "/" + e.NAME);
-  })
-  .then(function(yes){
-    if(!yes) {
-      return extractTarGZ(cwd + "/" + e.NAME);
     }
   });
 }
@@ -111,7 +117,7 @@ function node(cmd, opts){
     opts.NODE_ROOT+=NODE;
   }
 
-  return normalizeCommand(opts.execPath || env().NODE_PATH, cmd, opts);
+  return normalizeCommand(opts.NODE_ROOT || env().NODE_PATH, cmd, opts);
 }
 
 function npm(cmd, opts){
@@ -119,7 +125,7 @@ function npm(cmd, opts){
     opts.NODE_ROOT+=NPM;
   }
 
-  return normalizeCommand(opts.execPath || env().NPM_PATH, cmd, opts);
+  return normalizeCommand(opts.NODE_ROOT || env().NPM_PATH, cmd, opts);
 }
 
 function normalizeCommand(cmd, arg, opts){
@@ -136,6 +142,6 @@ function normalizeCommand(cmd, arg, opts){
   ].join(" "));
 }
 
-function extractTarGZ(path){
-  return pexec("tar zxvf " + path + TARGZ + "  >/dev/null 2>&1");
+function extractTarGZ(path, outDir){
+  return pexec("tar zxvf " + path + TARGZ + " -C " + outDir + " >/dev/null 2>&1");
 }

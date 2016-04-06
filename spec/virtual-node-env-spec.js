@@ -20,8 +20,10 @@ describe('Virtual Node Env Spec', function(){
 
   it('should switch node js version', function(){
     vne.version = "v5.10.1";
-    return node("-v", {NODE_ROOT: __dirname + "/.."}).then(function(outputs){
-      expect(outputs.stdout).to.eq("v5.10.1\n");
+    return vne.fetch(__dirname + "/../").then(function(){
+      return node("-v", {NODE_ROOT: __dirname + "/../node-v5.10.1-darwin-x64"}).then(function(outputs){
+        expect(outputs.stdout).to.eq("v5.10.1\n");
+      });
     });
   });
 });

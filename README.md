@@ -40,6 +40,12 @@ var vne = require("virtual-node-env");
 vne.version = "v5.10.0";
 ```
 
+## Fetch Node.js Binary
+
+```js
+vne.version = "v5.10.0";
+vne.fetch(); // Will be started to fetch node.js v5.10.0 from https://nodejs.org
+```
 
 ## Apis
 
@@ -47,7 +53,11 @@ vne.version = "v5.10.0";
 `vne.version`: {String} Node.js version string. default is `v4.4.2`
 
 #### Methods
+
 `vne.node`
+
+Execute node command with the specific options
+
 - parameters
   - cmd: The path that executable .js file or commnad options
   - opts
@@ -57,6 +67,9 @@ vne.version = "v5.10.0";
 - returns: Promise object
 
 `vne.npm`
+
+Execute npm command with the specific options
+
 - parameters
   - cmd: The path that executable
   - opts
@@ -65,6 +78,14 @@ vne.version = "v5.10.0";
 
 - returns: Promise object
 
+`vne.fetch`
+
+Fetch specific Node.js from https://nodejs.org
+
+- parameters
+  - dir: The directory that want to put the downloaded Node.js
+
+- returns: Promise object
 
 ## License
 (The MIT License)
