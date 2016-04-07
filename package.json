@@ -1,6 +1,6 @@
 {
   "name": "virtual-node-env",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Virtual environment that makes to run node ^v4.0x app on node v0.10x server",
   "main": "index.js",
   "scripts": {
