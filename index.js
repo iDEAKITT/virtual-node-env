@@ -77,8 +77,11 @@ function pexec(cmd){
   return new Promise(function(resolve, reject){
     exec(cmd, function(error, stdout, stderr){
       if(error) {
+        error.stderr = stderr;
+        error.stdout = stdout;
         return reject(error);
       }
+
       resolve({
         stdout: stdout,
         stderr: stderr
